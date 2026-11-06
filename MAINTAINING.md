@@ -79,10 +79,7 @@ Expected last line: `XDL link test PASSED`. Keep `WasmCachePath` apart from the 
 
 ## Update XDL
 
-Follow the steps of the section above, with a different step 2:
-
-1. Move the submodule: `git -C external/XDL fetch origin`, `git -C external/XDL checkout <tag or commit>`, `git -C external/XDL submodule update --init external/SDL`, `git add external/XDL`.
-2. Run `external/XDL/tools/apply.sh`.
+Follow the steps of the section above. Replace only its step 2 with: move the submodule (`git -C external/XDL fetch origin`, `git -C external/XDL checkout <tag or commit>`, `git -C external/XDL submodule update --init external/SDL`, `git add external/XDL`), then run `external/XDL/tools/apply.sh`.
 
 If XDL moved to a new SDL version, a copied notice can move, and step 4's license check matters most.
 
