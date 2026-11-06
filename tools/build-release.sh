@@ -115,6 +115,8 @@ library_copyrights() {
     notice "SDL: math functions from Sun's libm (XDL3.a)" external/XDL/build/SDL/src/libm/e_atan2.c 'Copyright \(C\) 1993 by Sun Microsystems' 'is preserved\.'
     notice_file "SDL: YUV to RGB conversion (XDL3.a)" external/XDL/build/SDL/src/video/yuv2rgb/LICENSE
     notice "SDL: keysym to UCS conversion (XDL3.a)" external/XDL/build/SDL/src/events/imKStoUCS.c 'Copyright \(C\) 2003-2006,2008 Jamey Sharp' 'DEALINGS IN THE SOFTWARE\.$'
+    # The backend compiles against this header from Emscripten's emdawnwebgpu port, which emsdk-env.sh caches here. It is outside the compiled sources list.
+    notice "XDL: WebGPU header of the emdawnwebgpu port (XDL3.a)" external/XDL/build/em-cache/ports/emdawnwebgpu/emdawnwebgpu_pkg/webgpu/include/webgpu/webgpu.h '^// BSD 3-Clause License$' 'SUCH DAMAGE\.$'
     notice "SDL_image: GIF decoder adapted from XPaint (SDL3_image.a)" external/SDL_image/src/IMG_gif.c 'Copyright 1990, 1991, 1993 David Koblas' 'provided "as is"'
     notice "SDL_image: QOI codec (SDL3_image.a)" external/SDL_image/src/qoi.h 'Copyright\(c\) 2021 Dominic Szablewski' '^SOFTWARE\.$'
     notice "FreeType: BDF driver (SDL3_ttf.a)" external/SDL_ttf/external/freetype/src/bdf/README '^License$' '^THE USE OR OTHER DEALINGS IN THE SOFTWARE\.$'
