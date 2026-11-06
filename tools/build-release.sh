@@ -142,12 +142,14 @@ emscripten_version=$(emcc --version | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+
 # One row of the release notes' source table. A submodule's version is the remote's tag of its commit: the workflow's shallow checkout
 # fetches no tags. A commit without a tag has no version.
 source_row() {
-    local commit="" url="" version=""
+    local commit="" url="" remote_tags="" version=""
     commit=$(git -C "$repo_root/$3" rev-parse HEAD)
     url=$(git -C "$repo_root/$3" remote get-url origin)
     url=${url/#git@github.com:/https://github.com/}
     url=${url%.git}
-    version=$(GIT_TERMINAL_PROMPT=0 git -C "$repo_root/$3" ls-remote --tags origin | awk -v commit="$commit" '$1 == commit { sub(/^refs\/tags\//, "", $2); sub(/\^\{\}$/, "", $2); print $2; exit }') || version=""
+    # A separate assignment, so a failed lookup stops the build instead of reading as no tag.
+    remote_tags=$(GIT_TERMINAL_PROMPT=0 git -C "$repo_root/$3" ls-remote --tags origin)
+    version=$(awk -v commit="$commit" '$1 == commit { sub(/^refs\/tags\//, "", $2); sub(/\^\{\}$/, "", $2); print $2; exit }' <<<"$remote_tags")
     printf '| %s | %s | %s | [%s](%s/commit/%s) |\n' "$1" "$2" "$version" "${commit:0:7}" "$url" "$commit"
 }
 {

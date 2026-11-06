@@ -19,6 +19,12 @@ jobs:
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
+      - name: Stop unless this runs on main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Release runs only on main, not $GITHUB_REF."
+          exit 1
+
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
