@@ -20,7 +20,7 @@ Reference the archives with `NativeFileReference`. Keep the file names: the .NET
 </PropertyGroup>
 ```
 
-`tools/native-references.sh [--file <dir> | --url] [tag]` prints the archives of a release, the latest without a tag, as MSBuild items in link order. `--file <dir>` (the default, with `<dir>` = `native`) downloads them into `<dir>`, checks their SHA-256 and prints these `NativeFileReference` items with absolute paths. `--url` prints `NativeUrlReference` items with each archive's URL and SHA-256 instead.
+`tools/native-references.sh [--file <dir> | --url] [tag]` prints the archives of a release, the latest without a tag, as MSBuild items in link order. `--file <dir>` (the default, with `<dir>` = `native`) downloads them into `<dir>`, checks their SHA-256 and prints these `NativeFileReference` items with absolute paths. The absolute paths are for your machine only, so commit the items with paths relative to the project instead. `--url` prints `NativeUrlReference` items with each archive's URL and SHA-256 instead.
 
 The .NET runtime does not use asyncify, so an app must create the GPU device without blocking. [XDL's WebGPU README](https://github.com/stanoddly/XDL/blob/main/patches/0007-webgpu-backend/README.md) describes how, along with the shader format and property names.
 

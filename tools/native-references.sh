@@ -4,7 +4,7 @@
 #   --file <dir>  downloads the archives into <dir>, checks their SHA-256, and prints NativeFileReference items with absolute paths (the default, into native)
 #   --url         prints NativeUrlReference items with the download URL and SHA-256 of each archive, for a custom MSBuild target
 #   tag           the release tag, such as v20260924.122755; without one, the latest release
-# Needs gh, authenticated for a private repository. GH_REPO selects another repository than stanoddly/XDL-browser-packages.
+# Needs gh, authenticated. GH_REPO selects another repository than stanoddly/XDL-browser-packages.
 set -euo pipefail
 
 usage() {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the release archives with the .NET browser runtime's exception flags and stages them in build/release-assets with
 # THIRD-PARTY-NOTICES.txt and release-notes.md.
-# Usage: tools/build-release.sh <tag> <owner/repo>   (emcc on PATH, for example from tools/emsdk-env.sh)
+# Usage: tools/build-release.sh <tag> <owner/repo>   (emcc on PATH, for example from external/XDL/tools/emsdk-env.sh)
 set -euo pipefail
 
 tag=$1
@@ -11,9 +11,18 @@ out_dir=$repo_root/build/release-assets
 build_dir=$repo_root/build/release
 flags="-fwasm-exceptions -sWASM_LEGACY_EXCEPTIONS=0"
 
+# Marks the build as altered SDL, as XDL's MAINTAINING.md says. SDL's own git describe cannot see through the nested worktree.
+xdl_version=$(sed -n 's/^ *XDL_VERSION: *//p' "$repo_root/external/XDL/.github/workflows/build.yml" | head -1)
+if [ -z "$xdl_version" ]; then
+    echo "build-release: no XDL_VERSION in external/XDL/.github/workflows/build.yml" >&2
+    exit 1
+fi
+xdl_commit=$(git -C "$repo_root/external/XDL" rev-parse --short=12 HEAD)
+
 # A fresh configure, so the archives come from the emcc on PATH that the release notes name, not from a compiler an older configure cached.
 rm -rf "$build_dir"
-emcmake cmake -S "$repo_root" -B "$build_dir" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="$flags" -DCMAKE_CXX_FLAGS="$flags"
+emcmake cmake -S "$repo_root" -B "$build_dir" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="$flags" -DCMAKE_CXX_FLAGS="$flags" \
+    "-DSDL_VENDOR_INFO=XDL-$xdl_version" "-DSDL_REVISION=SDL-${xdl_version%-*}-$xdl_commit"
 # A bare --parallel gives make no job limit, which starts every SDL compile at once.
 cmake --build "$build_dir" --parallel "$(nproc)" --target SDL3-static SDL3_image-static SDL3_mixer-static SDL3_ttf-static
 
@@ -54,7 +63,7 @@ notice_file() {
 
 # Every source and header the compilers read for the archives, from their dependency files, outside the build directory.
 repo_real=$(realpath "$repo_root")
-find "$build_dir" -name '*.o.d' -exec cat {} + | tr -s ' \\\t' '\n\n\n' | grep '^/' | sort -u | xargs realpath -m -- | grep "^$repo_real/" | grep -v "^$repo_real/build/" | sort -u > "$build_dir/compiled-sources.txt"
+find "$build_dir" -name '*.o.d' -exec cat {} + | tr -s ' \\\t' '\n\n\n' | grep '^/' | sort -u | xargs realpath -m -- | grep "^$repo_real/" | grep -v -e "^$repo_real/build/" -e "^$repo_real/external/XDL/build/em-cache/" | sort -u > "$build_dir/compiled-sources.txt"
 # The copyright lines of the given files, without comment decoration. A line ending in "by", "and" or a comma, or with years but no
 # holder, continues on the next line of the same file.
 # Lines with a double quote are string literals and documentation examples, not notices.

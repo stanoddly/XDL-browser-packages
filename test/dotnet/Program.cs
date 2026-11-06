@@ -12,17 +12,22 @@ internal static partial class Program
         int driverCount = SDL_GetNumGPUDrivers();
         string? firstDriver = driverCount > 0 ? Marshal.PtrToStringUTF8(SDL_GetGPUDriver(0)) : null;
         Console.WriteLine($"GPU drivers: {driverCount}, first: {firstDriver}");
+        string? revision = Marshal.PtrToStringUTF8(SDL_GetRevision());
+        Console.WriteLine($"Revision: {revision}");
         bool ttf = TTF_Init();
         bool mixer = MIX_Init();
         Console.WriteLine($"TTF_Init: {ttf}, MIX_Init: {mixer}");
 
-        bool passed = driverCount == 1 && firstDriver == "webgpu" && ttf && mixer;
+        bool passed = driverCount == 1 && firstDriver == "webgpu" && revision != null && revision.Contains("XDL-") && ttf && mixer;
         Console.WriteLine(passed ? "XDL link test PASSED" : "XDL link test FAILED");
         return passed ? 0 : 1;
     }
 
     [LibraryImport("XDL3")]
     private static partial int SDL_GetVersion();
+
+    [LibraryImport("XDL3")]
+    private static partial IntPtr SDL_GetRevision();
 
     [LibraryImport("XDL3")]
     private static partial int SDL_GetNumGPUDrivers();

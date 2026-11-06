@@ -9,7 +9,7 @@ How to release, test, and update the pinned libraries and the toolchain. [README
 | [Build](.github/workflows/build.yml) | On every pull request to `main`, and inside Release | Checks out the pinned libraries, applies the XDL patches, installs the .NET 11 preview SDK and its `wasm-tools` workload, builds the release assets with `tools/build-release.sh`, links them into the .NET browser app in `test/dotnet`, and uploads them as the `release-assets` artifact |
 | [Release](.github/workflows/release.yml) | By hand | Computes the tag, stops if it exists, runs Build, and publishes the artifact as a GitHub release. Only its last job has a token that can write |
 
-A pull request's `release-assets` artifact is a preview: the archives are the ones a release of the merged commit would publish, so they can be downloaded and tried before merging. Its tag is the placeholder `pr-<number>`, and its `release-notes.md` names GitHub's test merge commit, so its release notes are not final.
+A pull request's `release-assets` artifact is a preview: the archives are the ones a release of the merged commit would publish, so they can be downloaded and tried before merging. Its tag is the placeholder `pr-<number>`, and its `release-notes.md` links to that tag, so its release notes are not final.
 
 ## Release
 
@@ -79,9 +79,12 @@ Expected last line: `XDL link test PASSED`. Keep `WasmCachePath` apart from the 
 
 ## Update XDL
 
+Follow the steps of the section above, with a different step 2:
+
 1. Move the submodule: `git -C external/XDL fetch origin`, `git -C external/XDL checkout <tag or commit>`, `git -C external/XDL submodule update --init external/SDL`, `git add external/XDL`.
-2. Run `external/XDL/tools/apply.sh`, then the release build and the .NET link test.
-3. If XDL moved to a new SDL version, a copied notice can move. The release build then fails with "the notice of ... is missing or empty". Fix its start and end patterns in `tools/build-release.sh`.
+2. Run `external/XDL/tools/apply.sh`.
+
+If XDL moved to a new SDL version, a copied notice can move, and step 4's license check matters most.
 
 ## Change the codecs
 
@@ -91,7 +94,7 @@ The codecs of SDL_image and SDL_mixer are the `set(SDLIMAGE_…)` and `set(SDLMI
 
 - Build installs the newest .NET 11 preview SDK, so its Emscripten can change between two releases without a commit. The release notes of each release record the Emscripten version and the flags.
 - The archives link only into a .NET runtime built with the same Emscripten. A new .NET major version needs a new `dotnet-version` in `build.yml` and a new `TargetFramework` in `test/dotnet`.
-- Emscripten pins the Dawn version of the emdawnwebgpu port, so a new Emscripten can change the WebGPU header the backend compiles against. A compile error in XDL's `SDL_gpu_webgpu.c` after a .NET update is the first sign. Update the Emscripten and Dawn versions in README, Building.
+- Emscripten pins the Dawn version of the emdawnwebgpu port, so a new Emscripten can change the WebGPU header the backend compiles against. A compile error in XDL's `SDL_gpu_webgpu.c` after a .NET update is the first sign.
 - The release flags (`-fwasm-exceptions -sWASM_LEGACY_EXCEPTIONS=0`) match the .NET runtime's. If .NET changes its exception handling, change `flags` in `tools/build-release.sh`.
 
 ## Where the pinned versions are written
