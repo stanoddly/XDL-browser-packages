@@ -1,0 +1,4 @@
+build/
+test/dotnet/bin/
+test/dotnet/obj/
+/native/
